@@ -16,6 +16,8 @@ namespace BankRUs
             {
                 WriteLine("1. Registrera kund");
 
+                WriteLine("2. ");
+
                 WriteLine("2. Avsluta");
 
                 ConsoleKeyInfo keyPressed = ReadKey(true);
@@ -74,7 +76,7 @@ namespace BankRUs
                 Write("Postal address: ");
 
                 string postCode = ReadLine();
-
+                
                 WriteLine();
 
                 WriteLine("Är detta korrekt? (J)a eller (N)ej");
@@ -93,14 +95,15 @@ namespace BankRUs
                 } while (!isValidKey);
 
                 if (keyPressed.Key == ConsoleKey.J)
-                { 
+                {
+                    Address address = new Address(street, city, postCode);
+                    
                     customer = new Customer(
                         firstName, 
                         lastName, 
-                        socialSecurityNumber, 
-                        street, 
-                        city, 
-                        postCode);
+                        socialSecurityNumber,                        
+                        address
+                        );
 
                     SaveCustomer(customer);
 

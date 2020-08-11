@@ -6,27 +6,23 @@ namespace BankRUs.Domain
 {
     class Customer
     {
-        public int Id { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
-        public string SocialSecurityNumber { get; set; }
-        public string Street { get; set; }
-        public string City { get; set; }
-        public string PostCode { get; set; }
+        public int Id { get; protected set; }
+        public string FirstName { get; protected set; }
+        public string LastName { get; protected set; }
+        public string SocialSecurityNumber { get; protected set; }
+        public Address Address { get; protected set; }
 
-        public Customer(string firstName, string lastName, string socialSecurityNumber, string street, string city, string postCode)
+        public Customer()
+        {
+
+        }
+        
+        public Customer(string firstName, string lastName, string socialSecurityNumber, Address address)
         {
             FirstName = firstName;
             LastName = lastName;
             SocialSecurityNumber = socialSecurityNumber;
-            Street = street;
-            City = city;
-            PostCode = postCode;
-        }
-        public Customer(int id,string firstName, string lastName, string socialSecurityNumber, string street, string city, string postCode)
-        : this(firstName,lastName,socialSecurityNumber,street,city,postCode)
-        {
-            Id = id;
+            Address = address;
         }
                      
     }
