@@ -1,11 +1,14 @@
 ﻿using BankRUs.Domain;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using static System.Console;
 
 namespace BankRUs
 {
     class Program
-    {
+    {        
         // Vi behöver skapa en instans av DbContext-klassen.
         static BankRUsContext context = new BankRUsContext();
         static void Main(string[] args)
@@ -16,16 +19,20 @@ namespace BankRUs
             {
                 WriteLine("1. Registrera kund");
 
-                WriteLine("2. ");
+                WriteLine("2. Visa kunder");
 
-                WriteLine("2. Avsluta");
+                WriteLine("3. Öppna konto");
+
+                WriteLine("4. Visa kund");
+
+                WriteLine("5. Avsluta");
 
                 ConsoleKeyInfo keyPressed = ReadKey(true);
 
                 Clear();
 
                 switch (keyPressed.Key)
-                {
+                { 
                     case ConsoleKey.D1:
                     case ConsoleKey.NumPad1:
 
@@ -36,11 +43,67 @@ namespace BankRUs
                     case ConsoleKey.D2:
                     case ConsoleKey.NumPad2:
 
-                        isShouldNotExit = false;
+                        DisplayCustomers();
 
                         break;
+
+                    case ConsoleKey.D3:
+                    case ConsoleKey.NumPad3:
+
+                        OpenAccount();
+
+                        break;
+
+                    case ConsoleKey.D4:
+                    case ConsoleKey.NumPad4:
+
+                        DisplayCustomer();
+
+                        break;
+
+                    case ConsoleKey.D5:
+                    case ConsoleKey.NumPad5:
+
+                        isShouldNotExit = false;
+
+                        break;                    
                 }
             }
+        }
+
+        private static void DisplayCustomers()
+        {
+            // TODO: Ersätt new List<Customer>() med lista av kunder som
+            // laddas in från databasen.
+
+            List<Customer> customerLIst = context.Customer.ToList();
+
+            Write("Namn".PadRight(20, ' '));
+            WriteLine("Personnummer");
+            WriteLine("--------------------------------");
+
+            foreach (Customer customer in customerLIst)
+            {
+                string fullName = $"{customer.FirstName} {customer.LastName}";
+
+                Write(fullName.PadRight(20, ' '));
+                WriteLine(customer.SocialSecurityNumber);
+            }
+
+            ReadKey(true);
+
+            Clear();
+        
+        }
+
+        private static void OpenAccount()
+        {
+            throw new NotImplementedException();
+        }
+
+        private static void DisplayCustomer()
+        {
+            throw new NotImplementedException();
         }
 
         private static void RegisterCustomer()
@@ -101,29 +164,34 @@ namespace BankRUs
                     customer = new Customer(
                         firstName, 
                         lastName, 
-                        socialSecurityNumber,                        
-                        address
+                        socialSecurityNumber,
+                        address                        
                         );
 
                     SaveCustomer(customer);
 
+                    Clear();
+
+                    WriteLine("Kund registrerad");
+
+                    Thread.Sleep(2000);
+
                     isCorrect = false;
                 }
 
-            } while (isCorrect);
+                Clear();
 
-            Clear();
+            } while (isCorrect);            
 
         }
 
         private static void SaveCustomer(Customer customer)
         {
-            // Vi använder EntityFrame work att spara våra kund i databasen.
-            // Den är samma som git add.
+            // Vi har vi detta inte sparat ner vår customer ännu.
             context.Customer.Add(customer);
 
-            // Här pratar vi med databasen
-            // Den är samma som git commit
+            // Det är först när vi anropar SaveChanges() som våra ändringar sparas till
+            // databasen.
             context.SaveChanges();
         }
     }
