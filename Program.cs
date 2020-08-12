@@ -98,7 +98,7 @@ namespace BankRUs
 
         private static void OpenAccount()
         {
-            throw new NotImplementedException();
+            
         }
 
         private static void DisplayCustomer()
