@@ -1,4 +1,6 @@
 ﻿using BankRUs.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,15 +10,19 @@ using static System.Console;
 namespace BankRUs
 {
     class Program
-    {        
+    {
         // Vi behöver skapa en instans av DbContext-klassen.
-        static BankRUsContext context = new BankRUsContext();
+        static ILoggerFactory MyLoggerFactory = LoggerFactory.Create(DbContextOptionsBuilder => { DbContextOptionsBuilder.AddConsole();});
+
+        static BankRUsContext context = new BankRUsContext(MyLoggerFactory);
         static void Main(string[] args)
         {
             bool isShouldNotExit = true;
 
             while (isShouldNotExit)
             {
+                Clear(); 
+
                 WriteLine("1. Registrera kund");
 
                 WriteLine("2. Visa kunder");
@@ -98,12 +104,91 @@ namespace BankRUs
 
         private static void OpenAccount()
         {
+            WriteLine("Personnummer: ");
+
+            string socialSecurityNumber = ReadLine();
+
+            // Här har vi reference till customer från
+            // vår context.Customer 
+            Customer customer = context.Customer
+                .FirstOrDefault(x => x.SocialSecurityNumber == socialSecurityNumber);
+
+            Clear();
+
+            if ( customer != null)
+            {
+                // TODO: Skapa konto
+
+                Write("Kontonummer: ");
+
+                string accountNumber = ReadLine();
+
+                Account account = new Account(accountNumber);
+
+                // Vi har en instance/objekt till customer och
+                // den har samling med Accounts och den samling har 
+                // Add metod och vi ta lägga in vår account där. 
+                customer.Accounts.Add(account);
+
+                context.SaveChanges();
+
+                WriteLine("Konto skapat");
             
+            }
+            else
+            {
+                
+                WriteLine("Kund finns ej");
+
+               
+            }
+           
+            Thread.Sleep(2000);
         }
 
         private static void DisplayCustomer()
         {
-            throw new NotImplementedException();
+            WriteLine("Personnummer: ");
+
+            string socialSecurityNumber = ReadLine();
+
+            // Här har vi reference till customer från
+            // vår context.Customer 
+            Customer customer = context.Customer
+                .Include(x => x.Accounts)
+                .Include(x => x.Address)
+                .FirstOrDefault(x => x.SocialSecurityNumber == socialSecurityNumber);
+
+            Clear();
+
+            if (customer != null)
+            {
+                WriteLine($"Namn: {customer.FirstName}{ customer.LastName}");
+
+                WriteLine($"Address: {customer.Address.Street} {customer.Address.City} {customer.Address.PostCode}");
+                WriteLine();
+
+                Write("kontor:".PadRight(15, ' '));
+                WriteLine("Balance");
+                WriteLine("-------------------------------------");
+
+                foreach (Account account in customer.Accounts)
+                {
+                    Write(account.AccountNumber.PadRight(15, ' '));
+                    WriteLine(account.Balance);
+                }
+
+                ReadKey(true);
+
+            }
+            else
+            {
+
+                WriteLine("Kund finns ej");
+
+                Thread.Sleep(2000);
+            }         
+
         }
 
         private static void RegisterCustomer()
